@@ -3,7 +3,7 @@
 Plataforma de informações sobre filmes e séries desenvolvida como projeto da disciplina **CCM310 — Programação Orientada a Objetos** da FEI.
 
 **Aluno:** Gustavo Nomura — RA: 721250504
-**Professores:** Profa. Gabriela Biondi | Prof. Isaac de Jesus
+
 
 ---
 
