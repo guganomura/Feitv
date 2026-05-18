@@ -8,14 +8,13 @@ import model.Video;
 import java.sql.SQLException;
 import java.util.List;
 
-/**
- * Controla operações sobre ListaReproducao: CRUD e gerenciamento de vídeos.
- */
+// Responsável por intermediar todas as operações de listas de reprodução.
+// Valida os dados e repassa ao DAO — a View nunca acessa o banco diretamente.
 public class ListaReproducaoController {
 
     private final ListaReproducaoDAO dao = new ListaReproducaoDAO();
 
-    /** Retorna as listas do usuário. */
+    // Retorna todas as listas do usuário para exibir na tela de listas
     public List<ListaReproducao> listar(Usuario usuario) {
         try {
             return dao.listarPorUsuario(usuario);
@@ -24,7 +23,7 @@ public class ListaReproducaoController {
         }
     }
 
-    /** Cria uma nova lista com o nome informado. */
+    // Cria uma nova lista — valida que o nome não está vazio antes de chamar o banco
     public ListaReproducao criar(String nome, Usuario usuario) {
         if (nome == null || nome.isBlank()) {
             throw new IllegalArgumentException("O nome da lista não pode ser vazio.");
@@ -36,20 +35,20 @@ public class ListaReproducaoController {
         }
     }
 
-    /** Renomeia uma lista existente. */
+    // Renomeia uma lista — atualiza no banco E no objeto em memória
     public void editar(ListaReproducao lista, String novoNome) {
         if (novoNome == null || novoNome.isBlank()) {
             throw new IllegalArgumentException("O nome da lista não pode ser vazio.");
         }
         try {
-            dao.editar(lista.getId(), novoNome.trim());
-            lista.setNome(novoNome.trim());
+            dao.editar(lista.getId(), novoNome.trim()); // atualiza no banco
+            lista.setNome(novoNome.trim());             // atualiza o objeto em memória
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao editar lista: " + e.getMessage(), e);
         }
     }
 
-    /** Exclui a lista. */
+    // Exclui a lista do banco — o CASCADE nas foreign keys remove os vídeos da lista também
     public void excluir(ListaReproducao lista) {
         try {
             dao.excluir(lista.getId());
@@ -58,27 +57,27 @@ public class ListaReproducaoController {
         }
     }
 
-    /** Adiciona um vídeo à lista (persistindo no BD). */
+    // Adiciona um vídeo à lista — salva no banco E no objeto em memória
     public void adicionarVideo(ListaReproducao lista, Video video) {
         try {
-            dao.adicionarVideo(lista.getId(), video.getId());
-            lista.adicionarVideo(video);
+            dao.adicionarVideo(lista.getId(), video.getId()); // salva no banco
+            lista.adicionarVideo(video);                      // adiciona no objeto em memória
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao adicionar vídeo: " + e.getMessage(), e);
         }
     }
 
-    /** Remove um vídeo da lista (persistindo no BD). */
+    // Remove um vídeo da lista — remove do banco E do objeto em memória
     public void removerVideo(ListaReproducao lista, Video video) {
         try {
-            dao.removerVideo(lista.getId(), video.getId());
-            lista.removerVideo(video);
+            dao.removerVideo(lista.getId(), video.getId()); // remove do banco
+            lista.removerVideo(video);                      // remove do objeto em memória
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao remover vídeo: " + e.getMessage(), e);
         }
     }
 
-    /** Carrega os vídeos de uma lista a partir do BD. */
+    // Carrega os vídeos de uma lista buscando no banco — usado ao abrir a lista
     public void carregarVideos(ListaReproducao lista) {
         try {
             dao.carregarVideos(lista);
@@ -87,7 +86,7 @@ public class ListaReproducaoController {
         }
     }
 
-    /** Conta vídeos de uma lista. */
+    // Retorna quantos vídeos tem em uma lista para exibir na interface
     public int contarVideos(int idLista) {
         try {
             return dao.contarVideos(idLista);
